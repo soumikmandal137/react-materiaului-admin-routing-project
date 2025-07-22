@@ -4,6 +4,7 @@ import Signup from "../pages/Signup";
 import Layout from "../components/Layout";
 import Product from "../pages/admin/Product";
 import AddProduct from "../pages/admin/Addproduct";
+import ForgotPassword from "../pages/Forgotpassword";
 
 export const routes = createBrowserRouter([
     {
@@ -17,6 +18,10 @@ export const routes = createBrowserRouter([
      {
         path:"/signup",
         element: <Signup/>
+    },
+    {
+        path: "/forgotpassword",
+        element:<ForgotPassword/>
     },
     {
         path: "/admin",

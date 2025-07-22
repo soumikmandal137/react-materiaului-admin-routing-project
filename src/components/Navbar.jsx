@@ -15,9 +15,9 @@ import AdbIcon from '@mui/icons-material/Adb';
 
 const Navbar = () => {
   return (
-  <AppBar position="static" sx={{padding: 0}}>
-      <Container maxWidth="xxl" sx={{padding: 0}}>
-        <Toolbar disableGutters sx={{padding: 0}}>
+  <AppBar sx={{padding: 0,margin:0}}>
+      <Container maxWidth="xxl" disableGutters sx={{padding: 0,margin:0}}>
+        <Toolbar disableGutters sx={{padding: 0,margin:0}}>
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
