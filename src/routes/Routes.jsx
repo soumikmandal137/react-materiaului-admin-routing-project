@@ -1,41 +1,39 @@
 import { createBrowserRouter } from "react-router-dom";
 import Login from "../pages/Login";
-import Signup from "../pages/Signup";
 import Layout from "../components/Layout";
 import Product from "../pages/admin/Product";
-import AddProduct from "../pages/admin/Addproduct";
-import ForgotPassword from "../pages/Forgotpassword";
-
+import Addproduct from "../pages/admin/Addproduct";
+import SignUp from "../pages/Signup";
 export const routes = createBrowserRouter([
-    {
-        path:"/",
-        element: <Login/>
-    },
-     {
-        path:"/login",
-        element: <Login/>
-    },
-     {
-        path:"/signup",
-        element: <Signup/>
-    },
-    {
-        path: "/forgotpassword",
-        element:<ForgotPassword/>
-    },
-    {
-        path: "/admin",
-        element: <Layout/>,
-        children: [
-            {
-                path: "list",
-                element: <Product/>
-            },
-            {
-                path: "add",
-                element: <AddProduct/>
-            }
-        ]
-    }
+  {
+    path: "/",
+    element: <Login />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
+  },
 
-])
+  {
+    path: "/admin",
+    element: <Layout />,
+    children: [
+      {
+        path: "list",
+        element: <Product />,
+      },
+      {
+        path: "add",
+        element: <Addproduct />,
+      },
+      {
+        path: "edit/:id",
+        element: <Addproduct />,
+      },
+    ],
+  },
+]);

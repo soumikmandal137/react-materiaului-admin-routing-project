@@ -1,56 +1,30 @@
-import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Divider } from '@mui/material';
-import { Home, Info, ContactMail, Dashboard } from '@mui/icons-material';
-
-const drawerWidth = 240;
+import React from "react";
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          backgroundColor: '#1976d2',
-          color: 'white',
-        },
-      }}
-    >
-      <Toolbar />
-      <Divider />
+    <Box sx={{ width: "100%", p: 4 }}>
       <List>
-        <ListItem button>
-          <ListItemIcon sx={{ color: 'white' }}>
-            <Home />
-          </ListItemIcon>
-          <ListItemText primary="Home" />
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/admin/list">
+            <ListItemText primary="Product List" />
+          </ListItemButton>
         </ListItem>
 
-        <ListItem button>
-          <ListItemIcon sx={{ color: 'white' }}>
-            <Dashboard />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItem>
-
-        <ListItem button>
-          <ListItemIcon sx={{ color: 'white' }}>
-            <Info />
-          </ListItemIcon>
-          <ListItemText primary="About" />
-        </ListItem>
-
-        <ListItem button>
-          <ListItemIcon sx={{ color: 'white' }}>
-            <ContactMail />
-          </ListItemIcon>
-          <ListItemText primary="Contact" />
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/admin/add">
+            <ListItemText primary="Add Product" />
+          </ListItemButton>
         </ListItem>
       </List>
-    </Drawer>
+    </Box>
   );
 };
 

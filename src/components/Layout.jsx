@@ -1,29 +1,33 @@
-import { Box, Container } from "@mui/material";
-import React from "react";
+
+import { Box } from "@mui/material";
 import Navbar from "./Navbar";
-import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Layout = () => {
+  const navigate = useNavigate()
+  const loginData = JSON.parse(localStorage.getItem("loginData"))
+  useEffect(()=>{
+      if(!loginData){
+        navigate("/login")
+      }
+  },[loginData])
   return (
-    <Container maxWidth="xxl" sx={{padding: 0}}>
-      <Navbar />
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItem: "center",
-          width: "100%",
-        }}
-      >
-        <Box sx={{ width: "25%" }}>
-          <Sidebar />
-        </Box>
-        <Box sx={{ width: "75%" }}>
+    <Box sx={{ display: "flex", height: "100vh" }}>
+      {/* Sidebar */}
+      <Box sx={{ width: "240px", bgcolor: "#f4f4f4" }}>
+        <Sidebar />
+      </Box>
+
+      {/* Main content area */}
+      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Navbar />
+        <Box sx={{ p: 3 }}>
           <Outlet />
         </Box>
       </Box>
-    </Container>
+    </Box>
   );
 };
 

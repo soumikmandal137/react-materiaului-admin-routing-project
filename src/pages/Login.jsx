@@ -1,106 +1,141 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Corrected import
-import {
-  Avatar,
-  Button,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  Grid,
-  Box,
-  Typography,
-  Container,
-  CssBaseline,
-} from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { useState } from "react";
+import { Box, Button, TextField, Typography, Paper, Link } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log({ email, password });
-    // Add your login logic here
+  const [formData, setFormData] = useState({
+    userId: Math.random(),
+    email: "",
+    password: "",
+  });
+  
+  const [error, setError] = useState({});
+
+  const SignupData = JSON.parse(localStorage.getItem("SignUpData")) || {};
+  // console.log("signup data", SignupData);
+
+  const email = SignupData.email;
+  const password = SignupData.password;
+
+  console.log("Email", email);
+  console.log("Password", password);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setError((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
+  };
+
+  //Validating input values
+  const validate = () => {
+    const newError = {};
+
+    if (!formData.email.trim()) {
+      newError.email = "Email is required";
+    } else if (!formData.email.includes("@") || !formData.email.includes(".")) {
+      newError.email = "Email is invalid";
+    }
+
+    if (!formData.password.trim()) {
+      newError.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newError.password = "Password must be at least 6 characters";
+    }
+    setError(newError);
+
+    console.log("Validation errors:", newError);
+
+    return Object.keys(newError).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (validate()) {
+      if (email && password) {
+        if (formData.email !== email) {
+          alert("Incorrect email");
+          return;
+        }
+
+        if (formData.password !== password) {
+          alert("Incorrect password");
+          return;
+        }
+
+        localStorage.setItem("loginData", JSON.stringify(formData));
+        alert("Login Successful!");
+        navigate("/admin/list");
+      } else {
+        alert("First Do the Signup");
+        navigate("/signup");
+      }
+     } else {
+      alert("Please fix the errors before submitting.");
+    }
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          boxShadow: 3,
-          p: 4,
-          borderRadius: 5,
-          backgroundColor: '#fef9c3',
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <LockOutlinedIcon />
-        </Avatar>
-
-        <Typography component="h1" variant="h5">
-          LOGIN
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        bgcolor: "#f9f9f9",
+      }}
+    >
+      <Paper elevation={3} sx={{ p: 4, width: 350 }}>
+        <Typography variant="h5" gutterBottom>
+          Login
         </Typography>
-
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <form onSubmit={handleSubmit}>
           <TextField
-            margin="normal"
-            required
+            label="Email"
+            type="email"
             fullWidth
-            label="Email Address"
+            required
+            margin="normal"
             name="email"
-            autoComplete="email"
-            autoFocus
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleChange}
+            error={!!error.email}
+            helperText={error.email}
           />
-
           <TextField
-            margin="normal"
-            required
-            fullWidth
             label="Password"
-            name="password"
             type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-
-          <Button
-            type="submit"
             fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Sign In
+            required
+            margin="normal"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            error={!!error.password}
+            helperText={error.password}
+          />
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+            Login
           </Button>
-
-          <Grid container justifyContent="space-between">
-            <Grid item>
-              <Link to="/forgotpassword" style={{ fontSize: 14,color: "red",textDecoration: 'none' }}>
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link to="/signup" style={{ fontSize: 14,color: "red",textDecoration: 'none' }}>
-                Don't have an account? Sign up
-              </Link>
-            </Grid>
-          </Grid>
-        </Box>
-      </Box>
-    </Container>
+        </form>
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          Don't have an account?{" "}
+          <Link href="/signup" underline="hover">
+            Sign up
+          </Link>
+        </Typography>
+      </Paper>
+    </Box>
   );
 };
 
