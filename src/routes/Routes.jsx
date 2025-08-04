@@ -1,10 +1,12 @@
+// src/routes/index.js
 import { createBrowserRouter } from "react-router-dom";
 import Login from "../pages/Login";
+import SignUp from "../pages/Signup";
 import Layout from "../components/Layout";
 import Product from "../pages/admin/Product";
 import Addproduct from "../pages/admin/Addproduct";
-import SignUp from "../pages/Signup";
-export const routes = createBrowserRouter([
+
+export const Routes = createBrowserRouter([
   {
     path: "/",
     element: <Login />,
@@ -17,14 +19,13 @@ export const routes = createBrowserRouter([
     path: "/signup",
     element: <SignUp />,
   },
-
   {
     path: "/admin",
     element: <Layout />,
     children: [
       {
         path: "list",
-        element: <Product />,
+        element: <Product/>,
       },
       {
         path: "add",

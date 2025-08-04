@@ -1,21 +1,15 @@
-// import { useState } from 'react'
-import { ThemeProvider } from "@emotion/react";
-import { CssBaseline } from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import { RouterProvider } from "react-router-dom";
-import { routes } from "./routes/Routes";
-import theme from "./theme/Theme";
-// import './App.css'
+import theme from "./theme/theme";
+import { Routes } from "./routes/Routes";
 
 function App() {
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <RouterProvider router={routes} />
-      </ThemeProvider>
-    </>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <RouterProvider router={Routes}/>
+    </ThemeProvider>
   );
 }
 
 export default App;
-
