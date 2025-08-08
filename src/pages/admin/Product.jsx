@@ -281,6 +281,8 @@ const Product = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [productList, setProductList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteid, setDeleteid] = useState({});
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -306,6 +308,17 @@ setProductList(response?.data)
     fetchData();
   }, []);
 
+
+   const handledelete = async () => {
+    if (deleteid) {
+      try {
+        const response = await API.delete(`/products/${deleteid}`);
+        console.log(response);
+      } catch (error) {
+        console.log("product dlt", error);
+      }
+    }
+  };
 
 
   //  useEffect(() => {
@@ -358,8 +371,13 @@ setProductList(response?.data)
                     <Button onClick={() => navigate(`/admin/edit/${value.id}`)}>
                       <EditIcon />
                     </Button>
-                    <Button onClick={handleOpenDialog}>
-                      <DeleteIcon />
+                  <Button
+                      onClick={() => {
+                        setOpenDialog(true);
+                        setDeleteid(value.id);
+                      }}
+                    >
+                      {<DeleteIcon />}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -387,7 +405,14 @@ setProductList(response?.data)
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleCloseDialog} autoFocus>
+          
+          <Button
+            onClick={() => {
+              handledelete();
+              handleCloseDialog();
+            }}
+            autoFocus
+          >
             Delete
           </Button>
         </DialogActions>

@@ -175,79 +175,135 @@
 
 // export default Addproduct;
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Paper,
   TextField,
   Typography,
   MenuItem,
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import API from "../../api/api"
+import API from "../../api/api";
+
+// const schema = yup.object().shape({
+//   title: yup.string().required("Product Name is required"),
+//   body: yup.string().required("Description is required"),
+// });
+
+const categories = [
+  // { id: "", name: "-- Select Category --" },
+  { id: "electronics", name: "Electronics" },
+  { id: "Furniture", name: "Furniture" },
+  { id: "Assessories", name: "Assessories" },
+  { id: "books", name: "Books" },
+];
 
 const schema = yup.object().shape({
-  title: yup.string().required("Product Name is required"),
-  body: yup.string().required("Description is required"),
+  title: yup.string().required("Product name is required"),
+  price: yup
+    .number()
+    .typeError("Price must be a number")
+    .positive("Price must be greater than zero")
+    .required("Price is required"),
+  category: yup.string().required("Category is required"),
+  body: yup
+    .string()
+    .min(3, "Description must be at least 3 characters")
+    .required("Description is required"),
 });
 
-const categories = ["Electronics", "Furniture", "Accessories", "Books"];
+
+
+
 
 const Addproduct = () => {
-  const { id } = useParams();
-  console.log("item id", id);
+ const { id } = useParams();
+   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [editData, setEditData] = useState({});
 
-  const loginData = JSON.parse(localStorage.getItem("loginData"));
-  // console.log("data", loginData);
-
-  const userId = loginData.userId;
+  useEffect(() => {
+    const fetchIdData = async () => {
+      setLoading(true);
+      try {
+        const response = await API.get(`/products/${id}`);
+        // console.log(response);
+        setEditData(response?.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchIdData();
+  }, []);
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({ resolver: yupResolver(schema) });
-  const [form, setForm] = useState({
-    id: Math.random(),
-    userId: userId,
-    title: "",
-    category: "",
-    price: "",
-    body: "",
+    setValue,
+    watch,
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      title: "",
+      price: "",
+      category: "",
+      body: "",
+    },
   });
 
-    const handleformSubmit = async (data) => {
+  useEffect(() => {
+    if (id) {
+      const fetchIdData = async () => {
+        setLoading(true);
+        try {
+          const response = await API.get(`/products/${id}`);
+          setEditData(response.data);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchIdData();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (editData && Object.keys(editData).length > 0) {
+      Object.keys(editData).forEach((key) => {
+        console.log(key, editData[key]);
+        setValue(key, editData[key]);
+      });
+    }
+  }, [editData, setValue]);
+
+  const onSubmit = async (data) => {
+    try {
       if (id) {
-        try {
-          const response = await API.put(`/products/${id}`, data);
-          console.log("response", response);
-          // Reset form after successful submission
-
-          reset();
-        } catch (error) {
-          console.error(error);
-        }
+        await API.put(`/products/${id}`, data);
+        alert("Product updated successfully!");
       } else {
-        try {
-          const response = await API.post("/products", data);
-          console.log("response", response);
-          // Reset form after successful submission
-          reset();
-        } catch (error) {
-          console.error(error);
-        }
+        await API.post("/products", data);
+        alert("Product added successfully!");
+        reset(); // clear form
+        navigate("/admin/list");
       }
-    };
-  
-
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    console.log("This is called edit");
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
 
     // if (validate()) {
     //   console.log("Product added:", form);
@@ -263,125 +319,93 @@ const Addproduct = () => {
     // } else {
     //   alert("Please fix the errors before submitting.");
     // }
-  };
+
 
   return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
+    <Box
+      sx={{
+        maxWidth: 500,
+        mx: "auto",
+        mt: 4,
+        p: 3,
+        border: "1px solid #ccc",
+        borderRadius: 2,
+      }}
+    >
+      <Typography variant="h5" mb={2}>
         {id ? "Edit Product" : "Add New Product"}
       </Typography>
 
       <Paper elevation={3} sx={{ p: 4, maxWidth: 500 }}>
-        <form onSubmit={handleSubmit(handleformSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
-            label="Product Name"
-            name="title"
             fullWidth
-            required
-            margin="normal"
+            // label="Product Name"
             {...register("title")}
+            margin="normal"
             error={!!errors.title}
             helperText={errors.title?.message}
           />
 
           <TextField
-            label="Category"
-            select
             fullWidth
-            margin="normal"
-            {...register("category")}
-            error={!!errors.category}
-            helperText={errors.category?.message}
-          >
-            {categories.map((cat) => (
-              <MenuItem key={cat} value={cat}>
-                {cat}
-              </MenuItem>
-            ))}
-          </TextField>
-
-          <TextField
-            label="Price"
-            type="number"
-            fullWidth
-            margin="normal"
-            slotProps={{
-              input: {
-                min: 0,
-              },
-            }}
+            // label="Price"
             {...register("price")}
+            type="number"
+            margin="normal"
             error={!!errors.price}
             helperText={errors.price?.message}
           />
 
-          <TextField
-            label="Description"
-            fullWidth
-            margin="normal"
-            multiline
-            rows={3}
-            {...register("body")}
-            error={!!errors.body}
-            helperText={errors.body?.message}
-          />
-
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Category</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              // label="Age"
+              {...register("category")}
+              error={!!errors.category}
+              helperText={errors.category?.message}
+              value={watch("category")}
+            >
+              <MenuItem>----select Category----</MenuItem>
+              {categories.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           {/* <TextField
-            label="Category"
-            name="category"
-            value={form.category}
-            onChange={handleChange}
             select
             fullWidth
-            required
+            // label="Category"
+            {...register("category")}
             margin="normal"
-            error={!!error.category}
-            helperText={error.category}
+            error={!!errors.category}
+            helperText={errors.category?.message}
           >
-            {categories.map((cat) => (
-              <MenuItem key={cat} value={cat}>
-                {cat}
+            <MenuItem>----select Category----</MenuItem>
+            {categories.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
               </MenuItem>
             ))}
           </TextField> */}
 
-          {/* <TextField
-            label="Price"
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            type="number"
+          <TextField
             fullWidth
-            required
-            margin="normal"
-            inputProps={{ min: 0 }}
-            error={!!error.price}
-            helperText={error.price}
-          /> */}
-
-          {/* <TextField
-            label="Description"
-            name="body"
-            value={form.body}
-            onChange={handleChange}
-            fullWidth
-            required
-            margin="normal"
+            // label="Description"
             multiline
             rows={3}
-            error={!!error.body}
-            helperText={error.body}
-          /> */}
+            {...register("body")}
+            margin="normal"
+            error={!!errors.body}
+            helperText={errors.body?.message}
+          />
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
-            // onClick={id ? handleEditSubmit : handleSubmit}
-          >
-            {id ? "Update" : "Save"}
+          <Button fullWidth type="submit" variant="contained" sx={{ mt: 2 }}>
+            {id ? "UPDATE" : "SAVE"}
           </Button>
         </form>
       </Paper>
